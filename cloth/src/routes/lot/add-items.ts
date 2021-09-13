@@ -1,12 +1,13 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
+import axios from "axios";
 
 // middlewares
 import { requireAuth, validateParamId, validateRequest } from "@fujingr/common";
 import { validateDesignsPayload } from "../../middlewares/validate-designs-payload";
 
 // constants
-import { Role } from "@fujingr/common";
+import { Role, StockApiPayloadFromCloth } from "@fujingr/common";
 
 // models
 import { Lot } from "../../models/lot";
@@ -17,6 +18,7 @@ import { NotFoundError } from "@fujingr/common";
 // helpers
 import { updateDesignsPayload } from "../../helpers/update-designs-payload";
 import { saveItems } from "../../helpers/save-items";
+import { parseLotDesigns } from "../../helpers/parse-lot-designs";
 
 const router = express.Router();
 
@@ -51,6 +53,20 @@ router.put(
     // update inputSequence lot
     lot.set({ inputSequence });
     await lot.save();
+
+    // send to stock api
+    const stockApiPayload: StockApiPayloadFromCloth = {
+      article: {
+        id: (lot.article as unknown as { id: string }).id,
+        name: (lot.article as unknown as { name: string }).name,
+      },
+      designs: await parseLotDesigns(lot.designs, inputSequence),
+    };
+
+    await axios.post(
+      `${process.env.STOCK_API_URI}/api/stock/in`,
+      stockApiPayload
+    );
 
     res.status(200).send(lot);
   }

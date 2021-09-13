@@ -7,6 +7,10 @@ const start = async () => {
     throw new Error("MONGO_URI must be defined");
   }
 
+  if (!process.env.STOCK_API_URI) {
+    throw new Error("STOCK_API_URI must be defined");
+  }
+
   try {
     // mongoose
     await mongoose.connect(process.env.MONGO_URI);

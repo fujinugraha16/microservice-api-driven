@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
+import axios from "axios";
 
 // middlewares
 import {
@@ -10,7 +11,7 @@ import {
 import { validateDesignsPayload } from "../../middlewares/validate-designs-payload";
 
 // constants
-import { Role } from "@fujingr/common";
+import { Role, StockApiPayloadFromCloth } from "@fujingr/common";
 
 // models
 import { Article } from "../../models/article";
@@ -22,6 +23,7 @@ import { NotFoundError, BadRequestError } from "@fujingr/common";
 // helpers
 import { updateDesignsPayload } from "../../helpers/update-designs-payload";
 import { saveDesignsAndItems } from "../../helpers/save-designs-and-items";
+import { parseLotDesigns } from "../../helpers/parse-lot-designs";
 
 const router = express.Router();
 
@@ -72,6 +74,20 @@ router.post(
     // save designIds to lot
     lot.set({ designs: designIds });
     await lot.save();
+
+    // send to stock api
+    const stockApiPayload: StockApiPayloadFromCloth = {
+      article: {
+        id: article.id,
+        name: article.name,
+      },
+      designs: await parseLotDesigns(designIds),
+    };
+
+    await axios.post(
+      `${process.env.STOCK_API_URI}/api/stock/in`,
+      stockApiPayload
+    );
 
     res.status(201).send(lot);
   }

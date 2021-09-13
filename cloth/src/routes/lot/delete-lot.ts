@@ -1,10 +1,11 @@
 import express from "express";
+import axios from "axios";
 
 // middlewares
 import { requireAuth, validateParamId } from "@fujingr/common";
 
 // constants
-import { Role } from "@fujingr/common";
+import { Role, StockApiPayloadFromCloth } from "@fujingr/common";
 
 // models
 import { Lot } from "../../models/lot";
@@ -15,6 +16,7 @@ import { NotFoundError, ForbiddenError } from "@fujingr/common";
 
 // helpers
 import { deleteDesignsAndItems } from "../../helpers/delete-designs-and-items";
+import { parseLotDesigns } from "../../helpers/parse-lot-designs";
 
 const router = express.Router();
 
@@ -35,6 +37,9 @@ router.delete(
       throw new ForbiddenError("Lot has been used by other documents");
     }
 
+    // data for send to stock api
+    const designsPayload = await parseLotDesigns(lot.designs);
+
     // delete desings and items
     await deleteDesignsAndItems(lot.designs);
 
@@ -45,6 +50,20 @@ router.delete(
 
     // delete lot
     await Lot.findByIdAndRemove(id);
+
+    // send to stock api
+    const stockApiPayload: StockApiPayloadFromCloth = {
+      article: {
+        id: (lot.article as unknown as { id: string }).id,
+        name: (lot.article as unknown as { name: string }).name,
+      },
+      designs: designsPayload,
+    };
+
+    await axios.post(
+      `${process.env.STOCK_API_URI}/api/stock/out`,
+      stockApiPayload
+    );
 
     res.status(204).send({ success: true });
   }
