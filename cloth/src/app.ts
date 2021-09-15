@@ -22,6 +22,9 @@ import { updatePriceRouter } from "./routes/price/update-price";
 import { showPriceRouter } from "./routes/price/show-price";
 import { listPriceRouter } from "./routes/price/list-price";
 
+import { itemSaleRouter } from "./routes/item/item-sale";
+import { showItemRouter } from "./routes/item/show-item";
+
 // middlewares
 import { errorHandler, currentUser } from "@fujingr/common";
 
@@ -62,6 +65,9 @@ app.use(deletePriceRouter);
 app.use(updatePriceRouter);
 app.use(showPriceRouter);
 app.use(listPriceRouter);
+
+app.use(itemSaleRouter);
+app.use(showItemRouter);
 
 app.all("*", async () => {
   throw new NotFoundError();

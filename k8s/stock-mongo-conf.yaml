@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stock-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stock-mongo
+  template:
+    metadata:
+      labels:
+        app: stock-mongo
+    spec:
+      containers:
+        - name: stock-mongo
+          image: mongo
+          # volumeMounts:
+          #   - name: stock-mongo-storage
+          #     mountPath: /data/db
+      # volumes:
+      #   - name: stock-mongo-storage
+      #     persistentVolumeClaim:
+      #       claimName: cloth-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stock-mongo-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: stock-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017

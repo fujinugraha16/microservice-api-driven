@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sale-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sale
+  template:
+    metadata:
+      labels:
+        app: sale
+    spec:
+      containers:
+        - name: sale
+          image: fujinugraha/sale
+          env:
+            - name: MONGO_URI
+              value: "mongodb://sale-mongo-clusterip-srv:27017/sale"
+            - name: STOCK_API_URI
+              value: "http://stock-clusterip-srv:3000"
+            - name: CLOTH_API_URI
+              value: "http://cloth-clusterip-srv:3000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sale-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: sale
+  ports:
+    - name: sale
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

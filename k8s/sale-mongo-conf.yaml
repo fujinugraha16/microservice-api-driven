@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sale-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sale-mongo
+  template:
+    metadata:
+      labels:
+        app: sale-mongo
+    spec:
+      containers:
+        - name: sale-mongo
+          image: mongo
+          # volumeMounts:
+          #   - name: sale-mongo-storage
+          #     mountPath: /data/db
+      # volumes:
+      #   - name: sale-mongo-storage
+      #     persistentVolumeClaim:
+      #       claimName: cloth-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sale-mongo-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: sale-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017

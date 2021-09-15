@@ -29,7 +29,7 @@ router.get(
 
     const promises = stock.detailStocks.map(async (detailStock) => {
       const response = await axios.get(
-        `${process.env.CLOTH_API_URI}/api/lot/item/${detailStock}`
+        `${process.env.CLOTH_API_URI}/api/cloth/item/show/${detailStock}`
       );
       const itemDoc = response.data;
 

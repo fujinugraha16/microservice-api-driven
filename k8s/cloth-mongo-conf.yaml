@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloth-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloth-mongo
+  template:
+    metadata:
+      labels:
+        app: cloth-mongo
+    spec:
+      containers:
+        - name: cloth-mongo
+          image: mongo
+          # volumeMounts:
+          #   - name: cloth-mongo-storage
+          #     mountPath: /data/db
+      # volumes:
+      #   - name: cloth-mongo-storage
+      #     persistentVolumeClaim:
+      #       claimName: cloth-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloth-mongo-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: cloth-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017

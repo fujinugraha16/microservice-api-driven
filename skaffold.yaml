@@ -1,0 +1,42 @@
+apiVersion: skaffold/v2beta20
+kind: Config
+deploy:
+  kubectl:
+    manifests:
+      - "k8s/*.yaml"
+build:
+  local:
+    push: false
+  artifacts:
+    - image: fujinugraha/auth
+      context: auth
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: fujinugraha/cloth
+      context: cloth
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: fujinugraha/stock
+      context: stock
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: fujinugraha/sale
+      context: sale
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
