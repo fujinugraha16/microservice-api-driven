@@ -14,6 +14,10 @@ import { Lot } from "../../../models/lot";
 import { Design } from "../../../models/design";
 import { Item } from "../../../models/item";
 
+const axios = {
+  post: jest.fn(),
+};
+
 test("send 401 when not provide cookie", async () => {
   await request(app).post("/api/cloth/lot/create").send({}).expect(401);
 });
@@ -285,4 +289,33 @@ test("successfully create items data", async () => {
   const totalItemDocs = await Item.find().countDocuments();
 
   expect(totalItemDocs).toEqual(6);
+});
+
+test("successfully create items data", async () => {
+  const articleDoc = await createArticle();
+
+  const [pureLotCode, article, supplier] = [
+    randomString(5),
+    articleDoc.id,
+    "PT. Aliex Retail",
+  ];
+  const designs = [
+    {
+      code: "123",
+      name: "test 1",
+      color: "#000",
+      items: [
+        { length: 40, qty: 1 },
+        { length: 39, qty: 2 },
+        { length: 38, qty: 3 },
+      ],
+    },
+  ];
+
+  await request(app)
+    .post("/api/cloth/lot/create")
+    .set("Cookie", generateCookie())
+    .send({ pureLotCode, article, supplier, designs });
+
+  expect(axios.post).toHaveBeenCalled();
 });

@@ -15,6 +15,10 @@ import { Design } from "../../../models/design";
 import { Item } from "../../../models/item";
 import { Price } from "../../../models/price";
 
+const axios = {
+  post: jest.fn(),
+};
+
 test("send 401 when not provide cookie", async () => {
   await request(app).delete("/api/cloth/lot/delete/asdfas").expect(401);
 });
@@ -175,4 +179,48 @@ test("delete price too if lot have price", async () => {
 
   const checkPrice = await Price.findById(responsePrice.body.id);
   expect(checkPrice).toBeNull();
+});
+
+test("delete price too if lot have price", async () => {
+  const articleDoc = await createArticle();
+
+  const [pureLotCode, article, supplier] = [
+    randomString(5),
+    articleDoc.id,
+    "PT. Aliex Retail",
+  ];
+  const designs = [
+    {
+      code: "123",
+      name: "test",
+      color: "#fff",
+      items: [{ length: 10, qty: 1 }],
+    },
+  ];
+
+  const responseLot = await request(app)
+    .post("/api/cloth/lot/create")
+    .set("Cookie", generateCookie())
+    .send({ pureLotCode, article, supplier, designs })
+    .expect(201);
+
+  const [lot, retailPrice, wholesalerPrice, lotPrice] = [
+    responseLot.body.id,
+    5000,
+    10000,
+    120000,
+  ];
+
+  await request(app)
+    .post("/api/cloth/price/create")
+    .set("Cookie", generateCookie())
+    .send({ lot, retailPrice, wholesalerPrice, lotPrice })
+    .expect(201);
+
+  await request(app)
+    .delete(`/api/cloth/lot/delete/${responseLot.body.id}`)
+    .set("Cookie", generateCookie())
+    .expect(204);
+
+  expect(axios.post).toHaveBeenCalled();
 });
