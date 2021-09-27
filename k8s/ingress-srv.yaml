@@ -7,7 +7,7 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
-    - host: event-driven.dev
+    - host: fn-microservice.dev
       http:
         paths:
           - path: /api/auth/?(.*)

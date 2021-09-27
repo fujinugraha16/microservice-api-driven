@@ -21,7 +21,7 @@ spec:
       # volumes:
       #   - name: sale-mongo-storage
       #     persistentVolumeClaim:
-      #       claimName: cloth-db-pvc
+      #       claimName: sale-db-pvc-api-driven
 ---
 apiVersion: v1
 kind: Service

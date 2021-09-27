@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: sale-db-pvc
+  name: sale-db-pvc-api-driven
 spec:
   accessModes:
     - ReadWriteOnce

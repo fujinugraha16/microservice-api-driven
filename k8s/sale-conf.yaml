@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: sale
-          image: fujinugraha/sale
+          image: fujinugraha/sale:api-driven
           env:
             - name: MONGO_URI
               value: "mongodb://sale-mongo-clusterip-srv:27017/sale"
