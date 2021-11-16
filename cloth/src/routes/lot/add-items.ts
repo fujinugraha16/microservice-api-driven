@@ -1,13 +1,14 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import axios from "axios";
+import { cpuUsage } from "process";
 
 // middlewares
 import { requireAuth, validateParamId, validateRequest } from "@fujingr/common";
 import { validateDesignsPayload } from "../../middlewares/validate-designs-payload";
 
 // constants
-import { Role, StockApiPayloadFromCloth } from "@fujingr/common";
+import { Role, LotAddItemsEvent } from "@fujingr/common";
 
 // models
 import { Lot } from "../../models/lot";
@@ -34,6 +35,9 @@ router.put(
   validateRequest,
   validateDesignsPayload,
   async (req: Request, res: Response) => {
+    // cpu
+    const cpuUsageBefore = cpuUsage();
+
     const { id } = req.params;
     const { designs } = req.body;
 
@@ -48,27 +52,47 @@ router.put(
     const updatedDesigns = updateDesignsPayload(designs, inputSequence);
 
     // save items and update design
-    await saveItems(updatedDesigns);
+    const itemIds = await saveItems(updatedDesigns);
 
     // update inputSequence lot
     lot.set({ inputSequence });
     await lot.save();
 
     // send to stock api
-    const stockApiPayload: StockApiPayloadFromCloth = {
+    const payload: LotAddItemsEvent["data"] = {
       article: {
         id: (lot.article as unknown as { id: string }).id,
         name: (lot.article as unknown as { name: string }).name,
       },
-      designs: await parseLotDesigns(lot.designs, inputSequence),
+      designs: await parseLotDesigns(lot.designs, itemIds),
     };
 
-    await axios.post(
-      `${process.env.STOCK_API_URI}/api/stock/in`,
-      stockApiPayload
-    );
+    // update article in stock
+    let successStockLotIn = false;
+    do {
+      const response = await axios.post(
+        `${process.env.STOCK_API_URI}/api/stock/lot-in`,
+        payload
+      );
 
-    res.status(200).send(lot);
+      successStockLotIn = response.data.success;
+    } while (successStockLotIn === false);
+
+    // update article in stock
+    let successSaleLotIn = false;
+    do {
+      const response = await axios.post(
+        `${process.env.SALE_API_URI}/api/sale/lot-in`,
+        payload
+      );
+
+      successSaleLotIn = response.data.success;
+    } while (successSaleLotIn === false);
+
+    // record cpu usage
+    const cpuUsageAfter = cpuUsage(cpuUsageBefore);
+
+    res.status(200).send({ lot, cpuUsage: cpuUsageAfter });
   }
 );
 

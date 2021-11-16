@@ -1,22 +1,22 @@
 import request from "supertest";
-import { app } from "../../app";
+import { app } from "../../../app";
 
 // constants
 import { Role, UserPayload } from "@fujingr/common";
 
 // helpers
 import { generateCookie, extractCookie } from "@fujingr/common";
-import { createSale, id } from "../../helpers/sale-test";
+import { createStock, id } from "../../../helpers/stock-test";
 
 test("send 401 when not provide cookie", async () => {
-  await request(app).get("/api/sale/show/asdfasdf").expect(401);
+  await request(app).get("/api/stock/in-out/asdfasdf").expect(401);
 });
 
 test("send 401 when provide cookie with role customer", async () => {
   const cookie = generateCookie(Role.customer);
 
   const response = await request(app)
-    .get("/api/sale/show/asdfasdf")
+    .get("/api/stock/in-out/asdfasdf")
     .set("Cookie", cookie);
 
   const payload = extractCookie(cookie) as UserPayload;
@@ -27,27 +27,23 @@ test("send 401 when provide cookie with role customer", async () => {
 
 test("bad request when param 'id' invalid", async () => {
   await request(app)
-    .get("/api/sale/show/asdfasdf")
+    .get("/api/stock/in-out/asdfasdf")
     .set("Cookie", generateCookie())
     .expect(400);
 });
 
-test("send 404 if sale not found", async () => {
+test("send 404 if stock not found", async () => {
   await request(app)
-    .get(`/api/sale/show/${id}`)
+    .get(`/api/stock/in-out/${id}`)
     .set("Cookie", generateCookie())
     .expect(404);
 });
 
-test("send 200 when sale found", async () => {
-  const sale = await createSale();
+test("send 200 when stock with inOutStocks found", async () => {
+  const stock = await createStock();
 
-  const response = await request(app)
-    .get(`/api/sale/show/${sale.id.toString()}`)
+  await request(app)
+    .get(`/api/stock/in-out/${stock.id}`)
     .set("Cookie", generateCookie())
     .expect(200);
-
-  expect(response.body.id.toString()).toEqual(sale.id.toString());
-  expect(response.body.totalQty).toEqual(sale.totalQty);
-  expect(response.body.totalPrice).toEqual(sale.totalPrice);
 });

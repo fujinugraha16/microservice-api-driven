@@ -6,7 +6,7 @@ import { InOut } from "../constants/enum-in-out";
 type ID = Types.ObjectId;
 
 interface StockAttrs {
-  article: string;
+  article: ID;
   name: string;
   color: string;
   totalQty: number;
@@ -17,14 +17,14 @@ interface StockAttrs {
     qrCode: string;
     info: InOut;
   }[];
-  detailStocks: string[];
+  detailStocks: ID[];
 }
 
 const stockSchema = new Schema<StockAttrs>(
   {
     article: {
-      type: String,
-      required: true,
+      type: Schema.Types.ObjectId,
+      ref: "Article",
     },
     name: {
       type: String,
@@ -62,7 +62,12 @@ const stockSchema = new Schema<StockAttrs>(
         },
       },
     ],
-    detailStocks: [String],
+    detailStocks: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Item",
+      },
+    ],
   },
   {
     toJSON: {

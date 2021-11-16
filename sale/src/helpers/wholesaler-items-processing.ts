@@ -1,8 +1,10 @@
 // constants
 import { WholesalerItemPayload } from "../constants/wholesaler-item-payload";
 
+import { Item } from "../models/item";
+
 // events
-import { StockApiPayloadFromSale } from "@fujingr/common";
+import { SaleCreatedEvent, StockPayload } from "@fujingr/common";
 
 export const wholesalerItemsProcessing = async (
   wholesalerItems: WholesalerItemPayload[]
@@ -10,19 +12,39 @@ export const wholesalerItemsProcessing = async (
   let tempPrice = 0;
   let totalPrice = 0;
   let totalQty = 0;
-  const stockApiPayloadFromSale: StockApiPayloadFromSale[] = [];
+  const notFoundItemsQrCode: string[] = [];
+  const stockPayloads: StockPayload[] = [];
+  const updatedWholesalerItems: SaleCreatedEvent["data"]["wholesalerItems"] =
+    [];
 
-  wholesalerItems.forEach(({ itemId, qrCode, price, lengthInMeters }) => {
+  const promises = wholesalerItems.map(async ({ qrCode, price }) => {
     tempPrice += price;
 
-    stockApiPayloadFromSale.push({
-      itemId,
-      qrCode,
-      lengthInMeters,
-      lengthInYards: lengthInMeters * 1.09,
-      qty: 1,
-    });
+    const itemDoc = await Item.findOne({ qrCode });
+    if (itemDoc) {
+      const lengthInMeters = itemDoc.lengthInMeters;
+      const lengthInYards = itemDoc.lengthInYards;
+
+      itemDoc.set({
+        lengthInMeters: 0,
+        lengthInYards: 0,
+      });
+      await itemDoc.save();
+
+      updatedWholesalerItems.push({ qrCode, version: itemDoc.version! });
+
+      stockPayloads.push({
+        itemId: itemDoc.id.toString(),
+        lengthInMeters,
+        lengthInYards,
+        qty: 1,
+        version: itemDoc.version!,
+      });
+    } else {
+      notFoundItemsQrCode.push(qrCode);
+    }
   });
+  await Promise.all(promises);
 
   totalPrice += tempPrice;
   totalQty += wholesalerItems.length;
@@ -30,6 +52,8 @@ export const wholesalerItemsProcessing = async (
   return {
     totalPrice,
     totalQty,
-    stockApiPayloadFromSale,
+    notFoundItemsQrCode,
+    stockPayloads,
+    updatedWholesalerItems,
   };
 };

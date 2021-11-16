@@ -31,3 +31,10 @@ spec:
                 name: stock-clusterip-srv
                 port:
                   number: 3000
+          - path: /api/sale/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: sale-clusterip-srv
+                port:
+                  number: 3000

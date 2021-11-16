@@ -10,7 +10,7 @@ export const validateWholeSalerItems = (
 ) => {
   const { wholesalerItems } = req.body;
 
-  if (wholesalerItems && wholesalerItems.length > 0) {
+  if (!wholesalerItems || wholesalerItems.length === 0) {
     return next();
   }
 
@@ -19,7 +19,7 @@ export const validateWholeSalerItems = (
   }
 
   if (
-    !["item", "qrCode", "price", "lengthInMeters"].every((key) =>
+    !["qrCode", "price"].every((key) =>
       Object.keys(wholesalerItems[0]).includes(key)
     )
   ) {

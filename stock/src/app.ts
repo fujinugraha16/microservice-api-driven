@@ -4,12 +4,16 @@ import { json } from "body-parser";
 import cookieSession from "cookie-session";
 
 // routers
-import { stockInRouter } from "./routes/stock-in";
-import { stockOutRouter } from "./routes/stock-out";
-import { showStockRouter } from "./routes/show-stock";
-import { listStockRouter } from "./routes/list-stock";
-import { inOutStockRouter } from "./routes/in-out";
-import { detailStockRouter } from "./routes/detail-stock";
+import { lotInRouter } from "./routes/lot/lot-in";
+import { lotOutRouter } from "./routes/lot/lot-out";
+import { createArticleRouter } from "./routes/article/create-article";
+import { deleteArticleRouter } from "./routes/article/delete-article";
+import { updateArticleRouter } from "./routes/article/update-article";
+import { showStockRouter } from "./routes/stock/show-stock";
+import { listStockRouter } from "./routes/stock/list-stock";
+import { inOutStockRouter } from "./routes/stock/in-out";
+import { detailStockRouter } from "./routes/stock/detail-stock";
+import { stockSaleRouter } from "./routes/stock/stock-sale";
 
 // middlewares
 import { errorHandler, currentUser } from "@fujingr/common";
@@ -34,8 +38,12 @@ app.use(
 // authentication
 app.use(currentUser);
 
-app.use(stockInRouter);
-app.use(stockOutRouter);
+app.use(lotInRouter);
+app.use(lotOutRouter);
+app.use(createArticleRouter);
+app.use(deleteArticleRouter);
+app.use(updateArticleRouter);
+app.use(stockSaleRouter);
 app.use(showStockRouter);
 app.use(listStockRouter);
 app.use(inOutStockRouter);

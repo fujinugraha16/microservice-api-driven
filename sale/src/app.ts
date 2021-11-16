@@ -4,9 +4,11 @@ import { json } from "body-parser";
 import cookieSession from "cookie-session";
 
 // routers
-import { createSaleRouter } from "./routes/create-sale";
-import { listSaleRouter } from "./routes/list-sale";
-import { showSaleRouter } from "./routes/show-sale";
+import { lotInRouter } from "./routes/lot/lot-in";
+import { lotOutRouter } from "./routes/lot/lot-out";
+import { createSaleRouter } from "./routes/sale/create-sale";
+import { listSaleRouter } from "./routes/sale/list-sale";
+import { showSaleRouter } from "./routes/sale/show-sale";
 
 // middlewares
 import { errorHandler, currentUser } from "@fujingr/common";
@@ -31,6 +33,8 @@ app.use(
 // authentication
 app.use(currentUser);
 
+app.use(lotInRouter);
+app.use(lotOutRouter);
 app.use(createSaleRouter);
 app.use(showSaleRouter);
 app.use(listSaleRouter);

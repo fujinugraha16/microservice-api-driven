@@ -10,7 +10,7 @@ export const validateLotItems = (
 ) => {
   const { lotItems } = req.body;
 
-  if (lotItems && lotItems.length > 0) {
+  if (!lotItems || lotItems.length === 0) {
     return next();
   }
 
@@ -24,15 +24,7 @@ export const validateLotItems = (
     throw new BadRequestError("Field 'lotItems' invalid");
   }
 
-  if (typeof lotItems[0].items[0] !== "object") {
-    throw new BadRequestError("Field 'lotItems' invalid");
-  }
-
-  if (
-    !["itemId", "qrCode", "lengthInMeters"].every((key) =>
-      Object.keys(lotItems[0].items[0]).includes(key)
-    )
-  ) {
+  if (typeof lotItems[0].items[0] !== "string") {
     throw new BadRequestError("Field 'lotItems' invalid");
   }
 

@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
+import axios from "axios";
 
 // middlewares
 import {
@@ -69,6 +70,29 @@ router.put(
       detailReferences,
     });
     await article.save();
+
+    // update article in stock
+    let success = false;
+    do {
+      const response = await axios.put(
+        `${process.env.STOCK_API_URI}/api/stock/article/${id}`,
+        {
+          id: article.id,
+          name: article.name,
+          width: article.width,
+          gsm: article.gsm,
+          safetyStock: article.safetyStock,
+          typeOfSale: article.typeOfSale,
+          activities: article.activities,
+          departments: article.departments,
+          genders: article.genders,
+          detailReferences: article.detailReferences,
+          version: article.version,
+        }
+      );
+
+      success = response.data.success;
+    } while (success === false);
 
     res.status(200).send(article);
   }

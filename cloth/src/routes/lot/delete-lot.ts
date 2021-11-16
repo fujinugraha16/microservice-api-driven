@@ -5,7 +5,7 @@ import axios from "axios";
 import { requireAuth, validateParamId } from "@fujingr/common";
 
 // constants
-import { Role, StockApiPayloadFromCloth } from "@fujingr/common";
+import { Role, LotDeletedEvent } from "@fujingr/common";
 
 // models
 import { Lot } from "../../models/lot";
@@ -52,7 +52,7 @@ router.delete(
     await Lot.findByIdAndRemove(id);
 
     // send to stock api
-    const stockApiPayload: StockApiPayloadFromCloth = {
+    const payload: LotDeletedEvent["data"] = {
       article: {
         id: (lot.article as unknown as { id: string }).id,
         name: (lot.article as unknown as { name: string }).name,
@@ -60,10 +60,8 @@ router.delete(
       designs: designsPayload,
     };
 
-    await axios.post(
-      `${process.env.STOCK_API_URI}/api/stock/out`,
-      stockApiPayload
-    );
+    await axios.post(`${process.env.STOCK_API_URI}/api/stock/lot-out`, payload);
+    await axios.post(`${process.env.SALE_API_URI}/api/sale/lot-out`, payload);
 
     res.status(204).send({ success: true });
   }

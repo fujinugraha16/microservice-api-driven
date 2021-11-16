@@ -7,7 +7,7 @@ import { requireAuth, validateParamId } from "@fujingr/common";
 import { Role } from "@fujingr/common";
 
 // models
-import { Sale } from "../models/sale";
+import { Stock } from "../../models/stock";
 
 // errors
 import { NotFoundError } from "@fujingr/common";
@@ -15,19 +15,19 @@ import { NotFoundError } from "@fujingr/common";
 const router = express.Router();
 
 router.get(
-  "/api/sale/show/:id",
+  "/api/stock/show/:id",
   requireAuth([Role.admin, Role.employee]),
   validateParamId,
   async (req, res) => {
     const { id } = req.params;
 
-    const sale = await Sale.findById(id);
-    if (!sale) {
+    const stock = await Stock.findById(id).select("-inOutStocks -detailStocks");
+    if (!stock) {
       throw new NotFoundError();
     }
 
-    res.status(200).send(sale);
+    res.status(200).send(stock);
   }
 );
 
-export { router as showSaleRouter };
+export { router as showStockRouter };

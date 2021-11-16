@@ -1,4 +1,5 @@
 import express from "express";
+import axios from "axios";
 
 // middlewares
 import { validateParamId, requireAuth } from "@fujingr/common";
@@ -33,6 +34,9 @@ router.delete(
     if (totalLotDocs > 0) {
       throw new ForbiddenError("Article has been used by other documents");
     }
+
+    // delete data from stock
+    await axios.delete(`${process.env.STOCK_API_URI}/api/stock/article/${id}`);
 
     await Article.findByIdAndRemove(id);
 

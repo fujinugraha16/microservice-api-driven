@@ -1,5 +1,5 @@
 import request from "supertest";
-import { app } from "../../app";
+import { app } from "../../../app";
 import { Types } from "mongoose";
 
 // constants
@@ -7,7 +7,7 @@ import { randomString, Role, UserPayload } from "@fujingr/common";
 
 // helpers
 import { generateCookie, extractCookie } from "@fujingr/common";
-import { createSale } from "../../helpers/sale-test";
+import { createSale } from "../../../helpers/sale-test";
 
 test("send 401 when not provide cookie", async () => {
   await request(app).post("/api/sale/create").send({}).expect(401);

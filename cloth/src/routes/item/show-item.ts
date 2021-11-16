@@ -5,10 +5,10 @@ import { Item } from "../../models/item";
 
 const router = express.Router();
 
-router.get("/api/cloth/item/show/:id", async (req, res) => {
-  const { id } = req.params;
+router.get("/api/cloth/item/show/:qrCode", async (req, res) => {
+  const { qrCode } = req.params;
 
-  const item = await Item.findById(id);
+  const item = await Item.findOne({ qrCode });
 
   res.status(200).send(item);
 });

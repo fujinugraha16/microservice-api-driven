@@ -17,7 +17,7 @@ export const parseDesignsToStockPayloads = (
   article: ArticlePayload
 ) => {
   const stockPayloads: StockAttrs[] = designs.map((design) => ({
-    article: article.id,
+    article: new Types.ObjectId(article.id),
     name: `${article.name} ${design.name}`,
     color: design.color,
     totalQty: design.items.length,
@@ -33,7 +33,7 @@ export const parseDesignsToStockPayloads = (
       qrCode,
       info: InOut.IN,
     })),
-    detailStocks: design.items.map(({ id }) => id),
+    detailStocks: design.items.map(({ id }) => new Types.ObjectId(id)),
   }));
 
   return stockPayloads;

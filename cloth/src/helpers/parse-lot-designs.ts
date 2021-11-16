@@ -9,11 +9,11 @@ import { Item } from "../models/item";
 
 export const parseLotDesigns = async (
   designIds: string[] | Types.ObjectId[],
-  inputSequence?: number
+  itemIds?: string[] | Types.ObjectId[]
 ): Promise<DesignPayload[]> => {
   const designPromises = designIds.map(async (designId) => {
     const designDoc = await Design.findById(designId).select(
-      "-_id name color items"
+      "code name color items"
     );
 
     const itemPromises = designDoc!.items.map(async (item) => {
@@ -31,11 +31,15 @@ export const parseLotDesigns = async (
       return updatedItem;
     });
 
-    const updatedItems = inputSequence
-      ? (await Promise.all(itemPromises)).filter((item) =>
-          item.qrCode.includes(`${designDoc!.code}-${inputSequence}`)
+    const items = await Promise.all(itemPromises);
+
+    const updatedItems = itemIds
+      ? items.filter((item) =>
+          itemIds
+            .map((itemId) => itemId.toString())
+            .includes(item.id.toString())
         )
-      : await Promise.all(itemPromises);
+      : items;
 
     const updatedDesign: DesignPayload = {
       name: designDoc!.name,

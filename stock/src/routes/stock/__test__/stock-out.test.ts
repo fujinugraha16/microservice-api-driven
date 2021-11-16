@@ -1,14 +1,14 @@
 import request from "supertest";
-import { app } from "../../app";
+import { app } from "../../../app";
 
 // models
-import { Stock } from "../../models/stock";
+import { Stock } from "../../../models/stock";
 
 // constants
 import { DesignPayload, randomString } from "@fujingr/common";
 
 // helpers
-import { createStock } from "../../helpers/stock-test";
+import { createStock } from "../../../helpers/stock-test";
 
 const articleId = randomString(12);
 const qrCode = randomString(5);

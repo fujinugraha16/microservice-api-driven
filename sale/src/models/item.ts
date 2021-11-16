@@ -1,14 +1,11 @@
-import { Schema, model, Types } from "mongoose";
+import { Schema, model } from "mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
-
-type ID = Types.ObjectId;
 
 interface ItemAttrs {
   qrCode: string;
-  sold?: boolean;
   lengthInMeters: number;
   lengthInYards: number;
-  design: ID;
+  version?: number;
 }
 
 const itemSchema = new Schema<ItemAttrs>(
@@ -16,10 +13,6 @@ const itemSchema = new Schema<ItemAttrs>(
     qrCode: {
       type: String,
       required: true,
-    },
-    sold: {
-      type: Boolean,
-      default: false,
     },
     lengthInMeters: {
       type: Number,
@@ -29,13 +22,8 @@ const itemSchema = new Schema<ItemAttrs>(
       type: Number,
       required: true,
     },
-    design: {
-      type: Schema.Types.ObjectId,
-      ref: "Design",
-    },
   },
   {
-    timestamps: true,
     toJSON: {
       transform(doc, ret) {
         ret.id = ret._id;

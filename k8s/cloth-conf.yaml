@@ -20,6 +20,8 @@ spec:
               value: "mongodb://cloth-mongo-clusterip-srv:27017/cloth"
             - name: STOCK_API_URI
               value: "http://stock-clusterip-srv:3000"
+            - name: SALE_API_URI
+              value: "http://sale-clusterip-srv:3000"
 ---
 apiVersion: v1
 kind: Service

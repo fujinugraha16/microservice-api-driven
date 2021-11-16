@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
+import axios from "axios";
 
 // middlewares
 import {
@@ -7,6 +8,7 @@ import {
   requireAuth,
   validateTypeOfSale,
   validateGenders,
+  ArticleCreatedEvent,
 } from "@fujingr/common";
 
 // models
@@ -68,6 +70,23 @@ router.post(
       detailReferences,
     });
     await article.save();
+
+    // send data to stock and sale
+    const payload: ArticleCreatedEvent["data"] = {
+      id: article.id,
+      code: article.code,
+      name: article.name,
+      width: article.width,
+      gsm: article.gsm,
+      safetyStock: article.safetyStock,
+      typeOfSale: article.typeOfSale,
+      activities: article.activities,
+      departments: article.departments,
+      genders: article.genders,
+      detailReferences: article.detailReferences,
+    };
+
+    await axios.post(`${process.env.STOCK_API_URI}/api/stock/article`, payload);
 
     res.status(201).send(article);
   }

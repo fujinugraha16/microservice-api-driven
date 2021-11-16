@@ -1,8 +1,8 @@
 import request from "supertest";
-import { app } from "../../app";
+import { app } from "../../../app";
 
 // models
-import { Stock } from "../../models/stock";
+import { Stock } from "../../../models/stock";
 
 // constants
 import { DesignPayload, randomString } from "@fujingr/common";

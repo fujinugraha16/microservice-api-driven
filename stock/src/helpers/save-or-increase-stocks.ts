@@ -15,15 +15,11 @@ export const saveOrIncreaseStocks = async (stockPayloads: StockAttrs[]) => {
     const existingStock = await Stock.findOne({ article, color });
 
     if (existingStock) {
-      existingStock.set({
-        totalQty: existingStock.totalQty + totalQty,
-        totalLengthInMeters:
-          existingStock.totalLengthInMeters + totalLengthInMeters,
-        totalLengthInYards:
-          existingStock.totalLengthInYards + totalLengthInYards,
-        inOutStocks: [...existingStock.inOutStocks, ...inOutStocks],
-        detailStocks: [...existingStock.detailStocks, ...detailStocks],
-      });
+      existingStock.totalQty += totalQty;
+      existingStock.totalLengthInMeters += totalLengthInMeters;
+      existingStock.totalLengthInYards += totalLengthInYards;
+      existingStock.inOutStocks.push(...inOutStocks);
+      existingStock.detailStocks.push(...detailStocks);
       await existingStock.save();
     } else {
       const newStock = new Stock({

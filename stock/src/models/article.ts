@@ -5,6 +5,7 @@ import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import { TypeOfSale, Gender } from "@fujingr/common";
 
 interface ArticleAttrs {
+  id: string;
   code: string;
   name: string;
   width: number;
@@ -15,7 +16,6 @@ interface ArticleAttrs {
   safetyStock: number;
   typeOfSale: TypeOfSale;
   detailReferences?: string[];
-  version?: number;
 }
 
 const articleSchema = new Schema<ArticleAttrs>(
@@ -59,7 +59,7 @@ const articleSchema = new Schema<ArticleAttrs>(
   }
 );
 
-// add mongoose-update-if-current for optimistic concurrency control
+// add for the occ
 articleSchema.set("versionKey", "version");
 articleSchema.plugin(updateIfCurrentPlugin);
 

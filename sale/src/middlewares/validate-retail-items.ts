@@ -10,7 +10,7 @@ export const validateRetailItems = (
 ) => {
   const { retailItems } = req.body;
 
-  if (retailItems && retailItems.length > 0) {
+  if (!retailItems || retailItems.length === 0) {
     return next();
   }
 
@@ -19,7 +19,7 @@ export const validateRetailItems = (
   }
 
   if (
-    !["itemId", "qrCode", "price", "lengthInMeters"].every((key) =>
+    !["qrCode", "price", "lengthInMeters"].every((key) =>
       Object.keys(retailItems[0]).includes(key)
     )
   ) {

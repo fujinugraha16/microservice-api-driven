@@ -11,7 +11,7 @@ import {
 import { validateDesignsPayload } from "../../middlewares/validate-designs-payload";
 
 // constants
-import { Role, StockApiPayloadFromCloth } from "@fujingr/common";
+import { Role, LotCreatedEvent } from "@fujingr/common";
 
 // models
 import { Article } from "../../models/article";
@@ -76,7 +76,7 @@ router.post(
     await lot.save();
 
     // send to stock api
-    const stockApiPayload: StockApiPayloadFromCloth = {
+    const payload: LotCreatedEvent["data"] = {
       article: {
         id: article.id,
         name: article.name,
@@ -84,10 +84,8 @@ router.post(
       designs: await parseLotDesigns(designIds),
     };
 
-    await axios.post(
-      `${process.env.STOCK_API_URI}/api/stock/in`,
-      stockApiPayload
-    );
+    await axios.post(`${process.env.STOCK_API_URI}/api/stock/lot-in`, payload);
+    await axios.post(`${process.env.SALE_API_URI}/api/sale/lot-in`, payload);
 
     res.status(201).send(lot);
   }

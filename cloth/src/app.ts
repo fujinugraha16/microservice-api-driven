@@ -2,6 +2,7 @@ import express from "express";
 import "express-async-errors";
 import { json } from "body-parser";
 import cookieSession from "cookie-session";
+import responseTime from "response-time";
 
 // routers
 import { createArticleRouter } from "./routes/article/create-article";
@@ -36,6 +37,9 @@ app.set("trust proxy", true);
 
 // # body parser
 app.use(json());
+
+// # response time
+app.use(responseTime());
 
 // # cookie sessions
 app.use(

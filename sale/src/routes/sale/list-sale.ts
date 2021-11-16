@@ -7,7 +7,7 @@ import { requireAuth } from "@fujingr/common";
 import { Role } from "@fujingr/common";
 
 // models
-import { Sale } from "../models/sale";
+import { Sale } from "../../models/sale";
 
 const router = express.Router();
 

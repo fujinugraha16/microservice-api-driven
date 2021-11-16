@@ -8,7 +8,7 @@ import { requireAuth, validateParamId } from "@fujingr/common";
 import { Role } from "@fujingr/common";
 
 // models
-import { Stock } from "../models/stock";
+import { Stock } from "../../models/stock";
 
 // errors
 import { NotFoundError } from "@fujingr/common";
